@@ -4,7 +4,7 @@ on:
     branches:
       - main
 jobs:
-  check:
+  tfcheck:
     permissions:
       contents: read
       security-events: write
@@ -22,17 +22,27 @@ jobs:
         run: terraform fmt -check -recursive -no-color
       - name: "Terraform init"
         id: init
-        run: terraform init
+        run: terraform init -no-color
       - name: Terraform Validate
         id: validate
         run: terraform validate -no-color
+  checkov:
+    permissions:
+      contents: read
+      security-events: write
+      actions: read
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
       - name: Checkov GitHub Action
         uses: bridgecrewio/checkov-action@v12
         with:
           output_format: cli,sarif
           output_file_path: console,results.sarif
           directory: .
-          soft_fail: true
           download_external_modules: true
           github_pat: ${{ secrets.GH_PAT }}
           framework: terraform
