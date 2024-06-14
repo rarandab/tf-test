@@ -1,0 +1,36 @@
+name: "Terraform QA"
+on:
+  pull_request:
+    branches:
+      - main
+jobs:
+  check:
+    permissions:
+      contents: read
+      security-events: write
+      actions: read
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@v4
+      - name: Checkov GitHub Action
+        uses: bridgecrewio/checkov-action@v12
+        with:
+          output_format: cli,sarif
+          output_file_path: console,results.sarif
+      - name: Upload SARIF file
+        uses: github/codeql-action/upload-sarif@v3
+        if: success() || failure()
+        with:
+          sarif_file: results.sarif
+      - name: "Setup terraform"
+        uses: hashicorp/setup-terraform@v3
+      - name: "Check terraform fmt"
+        id: fmt
+        run: terraform fmt -check -recursive -no-color
+      - name: "Terraform init"
+        id: init
+        run: terraform init
+      - name: Terraform Validate
+        id: validate
+        run: terraform validate -no-color
