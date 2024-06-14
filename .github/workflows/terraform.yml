@@ -18,6 +18,10 @@ jobs:
         with:
           output_format: cli,sarif
           output_file_path: console,results.sarif
+          directory: .
+          soft_fail: true
+          download_external_modules: true
+          github_pat: ${{ secrets.GH_PAT }}
       - name: Upload SARIF file
         uses: github/codeql-action/upload-sarif@v3
         if: success() || failure()
