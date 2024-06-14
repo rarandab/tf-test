@@ -1,0 +1,28 @@
+name: "Terraform QA"
+on:
+  pull_request:
+    branches:
+      - main
+jobs:
+  check:
+    permissions:
+      contents: read
+      security-events: write
+      actions: read
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+      - name: "Setup terraform"
+        uses: hashicorp/setup-terraform@v3
+      - name: "Check terraform fmt"
+        id: fmt
+        run: terraform fmt -check -recursive -no-color
+      - name: "Terraform init"
+        id: init
+        run: terraform init
+      - name: Terraform Validate
+        id: validate
+        run: terraform validate -no-color
