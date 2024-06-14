@@ -46,6 +46,7 @@ jobs:
           download_external_modules: true
           github_pat: ${{ secrets.GH_PAT }}
           framework: terraform
+          quiet: true
       - name: Upload SARIF file
         uses: github/codeql-action/upload-sarif@v3
         if: success() || failure()
